@@ -1,0 +1,19 @@
+  api:
+    #build: ./api
+    image: golang:1.8
+    volumes:
+      #- ../:/usr/local/naitry
+      - ./:/go/src/wschat
+    environment:
+      #DATABASE_HOST: 'mysql'
+      #DATABASE_NAME: 'db_naitry'
+      #DATABASE_USER: 'naitry'
+      #DATABASE_PASSWORD: 'snct_naitry'
+      TZ: "Asia/Tokyo"
+    working_dir: "/go/src/wschat"
+    #links:
+    #  - mysql
+    ports:
+      - "9999:9999"
+    container_name: echo
+    command: go run /go/src/wschat/server.go
