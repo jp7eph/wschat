@@ -1,2 +1,5 @@
 package: wschat
-import: []
+import:
+- package: golang.org/x/net
+  subpackages:
+  - websocket
