@@ -18,9 +18,10 @@ func main() {
 		s := websocket.Server{Handler: websocket.Handler(echoHandler)}
 		s.ServeHTTP(w, req)
 	})
-	http.Handle("/", http.FileServer(http.Dir("/")))
+	http.Handle("/", http.FileServer(http.Dir("./")))
 
 	if err := http.ListenAndServe(":9999", nil); err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}
+
 }
