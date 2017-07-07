@@ -2,6 +2,16 @@
 WebSocket Chat
 送信した文字列の末尾に [HOGE] を付けてサーバからレスポンスされます．
 
+## 開発環境
+
+* golang Version:1.8
+* パッケージ管理：glide
+
+## How to Install
+
+1. `# glide install`
+1. `# go run server.go`
+
 ## How to Use
 
 1. [CONNECT] を押す
