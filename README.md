@@ -1,5 +1,6 @@
 # wschat
 WebSocket Chat
+
 送信した文字列の末尾に [HOGE] を付けてサーバからレスポンスされます．
 
 ## 開発環境
@@ -13,7 +14,9 @@ WebSocket Chat
 1. `# go run server.go`
 
 ## How to Use
+(localhost下の場合)
 
+1. localhost:9999 にアクセス
 1. [CONNECT] を押す
 1. テキストボックスに好きな文字列を書く
 1. [SEND] を押す
@@ -28,6 +31,7 @@ WebSocket Chat
 ## 修正予定内容
 
 * 送受信を無期限におこなうためにHandlerを無限ループにしているため修正必要（？）
+
 ループにしないでクライアントに送信したら，勝手に切断された
 
 ***
