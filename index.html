@@ -1,0 +1,54 @@
+<html>
+<head>
+    <title>WSChat -Websocket Chat-</title>
+    <script type="text/javascript">
+    var output;
+    function init() {
+        input = document.getElementById("InTextBox");
+        status = document.getElementById("status");
+        output = document.getElementById("output");
+    }
+
+    window.addEventListener("load", init, false);
+    </script>
+    <script>
+        function ConBtn() {
+            testWebSocket();
+            writeToStatus("CONNECTED OK!");
+        }
+
+        function DisConBtn() {
+            onClose();
+            writeToStatus("DISConnected ...")
+        }
+
+        function SendBtn() {
+            var input;
+            input = document.forms.inputForm.InTextBox
+            doSend(input.value);
+        }
+
+        function writeToStatus(message) {
+            document.getElementById("status").innerHTML = message;
+        }
+    </script>
+    <script src="js/websocket.js"></script>
+</head>
+<body>
+    <h2>WebSocket Chat Test</h2>
+    <button onclick="ConBtn()">CONNECT</button>
+    <button onclick="DisConBtn()">DISCONNECT</button>
+    <div id="input">
+        <form id="inputForm">
+            <label>Input Area</label>
+            <input type="text" id="InTextBox">
+        </form>
+        <button onclick="SendBtn()">SEND</button>
+        
+    </div>
+    <h3>Status</h3>
+    <p id="status"></p>
+    <h3>LOG</h3>
+    <div id="output"></div>
+</body>
+</html>
