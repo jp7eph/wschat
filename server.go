@@ -24,7 +24,7 @@ func echoHandler(ws *websocket.Conn) {
 
 		log.Printf("data=%#v\n", buf)
 
-		res.Msg = buf.Msg + "HOGE"
+		res.Msg = buf.Msg + " [HOGE]"
 		// send json data
 		websocket.JSON.Send(ws, res)
 
