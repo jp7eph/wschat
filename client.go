@@ -7,6 +7,7 @@ package main
 import (
 	"bytes"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -46,6 +47,9 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	send chan []byte
+
+	// Client ID
+	ID string
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -70,6 +74,7 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+		log.Printf("recv: %s", message)
 		c.hub.broadcast <- message
 	}
 }
@@ -120,6 +125,31 @@ func (c *Client) writePump() {
 	}
 }
 
+// Init is initialize per connection
+//
+// Make Client ID and send it
+func (c *Client) Init() {
+
+	c.ID = RandString(10)
+	log.Printf("Connect ID = %s", c.ID)
+	message := []byte("Your ID is " + c.ID)
+	c.send <- message
+}
+
+const rsLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+// RandString is create random string
+//
+// n is string length
+func RandString(n int) string {
+	rand.Seed(time.Now().UnixNano())
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = rsLetters[rand.Intn(len(rsLetters))]
+	}
+	return string(b)
+}
+
 // serveWs handles websocket requests from the peer.
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -129,6 +159,8 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
 	client.hub.register <- client
+
+	client.Init()
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
