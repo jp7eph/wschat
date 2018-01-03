@@ -1,54 +1,72 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title>WSChat -Websocket Chat-</title>
-    <script type="text/javascript">
-    var output;
-    function init() {
-        input = document.getElementById("InTextBox");
-        status = document.getElementById("status");
-        output = document.getElementById("output");
-    }
-
-    window.addEventListener("load", init, false);
-    </script>
-    <script>
-        function ConBtn() {
-            testWebSocket();
-            writeToStatus("CONNECTED OK!");
+<title>WSChat -Websocket Chat-</title>
+<meta charset="utf-8">
+<script>
+window.addEventListener("load", function(evt) {
+    var output = document.getElementById("output");
+    var input = document.getElementById("input");
+    var ws;
+    var print = function(message) {
+        var d = document.createElement("div");
+        d.innerHTML = message;
+        output.appendChild(d);
+    };
+    document.getElementById("open").onclick = function(evt) {
+        if (ws) {
+            return false;
         }
-
-        function DisConBtn() {
-            onClose();
-            writeToStatus("DISConnected ...")
+        ws = new WebSocket("{{.}}");
+        ws.onopen = function(evt) {
+            print("OPEN");
+        };
+        ws.onclose = function(evt) {
+            print("CLOSE");
+            ws = null;
+        };
+        ws.onmessage = function(evt) {
+            print("RESPONSE: " + evt.data);
+        };
+        ws.onerror = function(evt) {
+            print("ERROR: " + evt.data);
+        };
+        return false;
+    };
+    document.getElementById("send").onclick = function(evt) {
+        if (!ws) {
+            return false;
         }
-
-        function SendBtn() {
-            var input;
-            input = document.forms.inputForm.InTextBox
-            doSend(input.value);
+        print("SEND: " + input.value);
+        ws.send(input.value);
+        return false;
+    };
+    document.getElementById("close").onclick = function(evt) {
+        if (!ws) {
+            return false;
         }
-
-        function writeToStatus(message) {
-            document.getElementById("status").innerHTML = message;
-        }
-    </script>
-    <script src="js/websocket.js"></script>
+        ws.close();
+        return false;
+    };
+});
+</script>
 </head>
 <body>
-    <h2>WebSocket Chat Test</h2>
-    <button onclick="ConBtn()">CONNECT</button>
-    <button onclick="DisConBtn()">DISCONNECT</button>
-    <div id="input">
-        <form id="inputForm">
-            <label>Input Area</label>
-            <input type="text" id="InTextBox">
-        </form>
-        <button onclick="SendBtn()">SEND</button>
-        
-    </div>
-    <h3>Status</h3>
-    <p id="status"></p>
-    <h3>LOG</h3>
-    <div id="output"></div>
+<table>
+<tr><td valign="top" width="50%">
+<p>Click "Open" to create a connection to the server, 
+"Send" to send a message to the server and "Close" to close the connection. 
+You can change the message and send multiple times.
+<p>
+<form>
+<button id="open">Open</button>
+<button id="close">Close</button>
+<p><input id="input" type="text" value="Hello world!">
+<button id="send">Send</button>
+</form>
+</td><td valign="top" width="50%">
+<h2>LOG</h2>
+<div id="output"></div>
+</td></tr></table>
 </body>
 </html>

@@ -1,46 +1,40 @@
+// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package main
 
 import (
-	"net/http"
-
+	"flag"
 	"log"
-
-	"golang.org/x/net/websocket"
+	"net/http"
 )
 
-func echoHandler(ws *websocket.Conn) {
-	type data struct {
-		Msg string
+var addr = flag.String("addr", ":8080", "http service address")
+
+func serveHome(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL)
+	if r.URL.Path != "/" {
+		http.Error(w, "Not found", 404)
+		return
 	}
-
-	var buf, res data
-
-	res.Msg = "Connected Server!!"
-	websocket.JSON.Send(ws, res)
-
-	for {
-		// receive json data
-		websocket.JSON.Receive(ws, &buf)
-
-		log.Printf("data=%#v\n", buf)
-
-		res.Msg = buf.Msg + " [HOGE]"
-		// send json data
-		websocket.JSON.Send(ws, res)
-
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", 405)
+		return
 	}
+	http.ServeFile(w, r, "home.html")
 }
 
 func main() {
-	//http.Handle("/echo", websocket.Handler(echoHandler))
-	http.HandleFunc("/echo", func(w http.ResponseWriter, req *http.Request) {
-		s := websocket.Server{Handler: websocket.Handler(echoHandler)}
-		s.ServeHTTP(w, req)
+	flag.Parse()
+	hub := newHub()
+	go hub.run()
+	http.HandleFunc("/", serveHome)
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(hub, w, r)
 	})
-	http.Handle("/", http.FileServer(http.Dir("./")))
-
-	if err := http.ListenAndServe(":9999", nil); err != nil {
-		panic("ListenAndServe: " + err.Error())
+	err := http.ListenAndServe(*addr, nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
 	}
-
 }
